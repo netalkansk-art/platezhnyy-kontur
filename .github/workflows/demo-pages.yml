@@ -1,0 +1,40 @@
+name: Публикация демо
+on:
+  push:
+    branches: [main]
+    paths: [index.html, demo.js, .github/workflows/demo-pages.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+concurrency:
+  group: pages
+  cancel-in-progress: false
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/configure-pages@v5
+      - name: Подготовить публичное демо
+        run: |
+          mkdir public-demo
+          npm install --prefix "$RUNNER_TEMP/payment-demo" --ignore-scripts --no-audit --no-fund exceljs@4.4.0
+          cp "$RUNNER_TEMP/payment-demo/node_modules/exceljs/dist/exceljs.min.js" public-demo/
+          cp "$RUNNER_TEMP/payment-demo/node_modules/exceljs/LICENSE" public-demo/exceljs-LICENSE.txt
+          cp demo.js public-demo/
+          python - <<'PY'
+          from pathlib import Path
+          html = Path('index.html').read_text(encoding='utf-8-sig')
+          html = html.replace('<script>', '<script src="exceljs.min.js"></script>\n<script src="demo.js"></script>\n<script>', 1)
+          Path('public-demo/index.html').write_text(html, encoding='utf-8')
+          PY
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: public-demo
+      - uses: actions/deploy-pages@v4
+        id: deployment

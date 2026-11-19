@@ -510,8 +510,13 @@ function applySnapshot(snapshot) {
   requests = snapshot.requests;
   revision = snapshot.revision;
 }
+const requestApi = window.publicDemoRequest ?? ((...args) => fetch(...args));
+if (window.publicDemoRequest) {
+  const notice = document.querySelector('#signIn .muted');
+  notice.textContent = 'Публичное демо. Только вымышленные данные. Изменения сохраняются в этом браузере.';
+}
 async function loadRequests() {
-  const response = await fetch('/api/requests', {cache:'no-store'});
+  const response = await requestApi('/api/requests', {cache:'no-store'});
   if (!response.ok) throw new Error('Ошибка загрузки');
   applySnapshot(await response.json());
 }
@@ -521,7 +526,7 @@ async function save(message) {
   $('workspace').inert = true;
   $('logout').disabled = true;
   try {
-    const response = await fetch('/api/requests', {
+    const response = await requestApi('/api/requests', {
       method:'PUT', headers:{'Content-Type':'application/json'},
       body:JSON.stringify({revision,requests})
     });
@@ -542,7 +547,7 @@ async function save(message) {
 }
 async function exportRegistry() {
   try {
-    const response = await fetch('/api/registry.xlsx', {
+    const response = await requestApi('/api/registry.xlsx', {
       method:'POST', headers:{'Content-Type':'application/json'},
       body:JSON.stringify({revision,ids:registryItems.map(request => request.id)})
     });
