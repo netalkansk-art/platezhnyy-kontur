@@ -1,0 +1,41 @@
+# Local environments and Python caches
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Credentials and private keys
+.env
+.env.*
+*.env
+*.pem
+*.key
+*.p12
+*.pfx
+*.ppk
+id_rsa*
+id_ed25519*
+*password*
+*secret*
+*credential*
+secrets/
+keys/
+
+# Local databases, backups, exports and screenshots
+*.db
+*.db-*
+*.sqlite
+*.sqlite-*
+*.sqlite3
+*.sqlite3-*
+*.bak
+*.backup
+*.dump
+*.sql
+*.json
+*.xlsx
+*.xls
+*.csv
+*.tsv
+payment-mobile*.png

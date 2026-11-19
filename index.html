@@ -1,0 +1,816 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Платежи · Согласование</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f4f6fa;color:#172338;font:15px system-ui,sans-serif}header{background:#15243c;color:white;padding:16px clamp(16px,4vw,52px);display:flex;align-items:center;gap:12px}.logo{background:#5b71ef;border-radius:10px;padding:7px 11px;font-weight:800}.demo{margin-left:auto;color:#c3cde0;font-size:13px}main{max-width:1440px;margin:auto;padding:32px clamp(16px,4vw,52px)}h1{font-size:clamp(27px,4vw,39px);margin:0}h2{font-size:17px;margin:0}.toolbar,.actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center}.toolbar{margin:22px 0}.toolbar input{flex:1;min-width:0}.toolbar select{min-width:0;max-width:100%}button,input,select,textarea{font:inherit;border:1px solid #ccd4e2;border-radius:8px;padding:10px 12px;background:white;color:inherit}button{cursor:pointer}.primary{background:#435bd6;color:white;border-color:#435bd6;font-weight:650}.board{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}.lane{background:#eaf0f7;border-radius:12px;padding:12px;border-top:4px solid var(--accent);min-width:0}.lane header{display:block;background:none;color:inherit;padding:3px 2px 12px}.summary,.muted{color:#51617a;font-size:13px}.card{display:block;width:100%;text-align:left;margin:0 0 9px;padding:13px;border:1px solid #d6dfed;overflow-wrap:anywhere}.card:last-child{margin-bottom:0}.card:hover{border-color:#5269d4}.card strong,.card span{display:block}.card .amount{font-weight:750;margin:8px 0 4px}.card .muted{margin-top:5px}.empty{padding:8px 2px;color:#51617a}dialog{width:min(520px,calc(100% - 24px));max-height:90dvh;border:0;border-radius:14px;padding:20px;color:inherit;box-shadow:0 18px 80px #15243c55}dialog::backdrop{background:#15243c90}form,label{display:grid;gap:8px}form{gap:12px}label input,label textarea{width:100%}.details{white-space:pre-wrap;overflow-wrap:anywhere}.note{background:#eef1ff;padding:10px;border-radius:8px}#message{min-height:1.4em;color:#4354aa}@media(max-width:680px){main{padding-top:22px}.board{grid-template-columns:1fr}.toolbar input{flex-basis:100%}.toolbar select,.toolbar button{flex:1}.lane{padding:10px}}
+[hidden]{display:none!important}.login{max-width:460px;margin:3vh auto;background:white;padding:clamp(16px,4vw,28px);border-radius:14px}.login form{margin-top:14px}.login select{width:100%}#smsField label{margin-top:10px}
+body{background:#f5f4fa;color:#211e32}body>header{background:#fff;color:#211e32;border-bottom:1px solid #e8e4f0;min-height:64px}.demo{color:#57448d}.primary,.logo{background:#5942bd;border-color:#5942bd}.logo{color:white}.workspace{display:grid;grid-template-columns:216px minmax(0,1fr);min-height:calc(100vh - 64px)}.sidebar{background:#22213a;color:#fff;padding:24px 14px}.brand{display:flex;align-items:center;gap:12px;margin:0 8px 30px}.sidebar nav{display:grid;gap:8px}.sidebar button{color:#e1deef;background:transparent;border-color:transparent;text-align:left}.sidebar button[aria-pressed=true]{background:#393352;color:white}.content{width:100%;max-width:1560px}.pagehead{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}.pagehead h1{margin-top:5px}.metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:22px}.metric{background:#fff;border:1px solid #e5e1ee;border-radius:12px;padding:14px;border-left:4px solid var(--accent);overflow-wrap:anywhere}.metric strong{display:block;font-size:clamp(17px,2.2vw,26px);margin:4px 0}.lane{background:#eeebf5}.card{border-color:#e4e0ee;box-shadow:0 2px 6px #211e3209}.card .amount{font-size:19px}.card .due{border-top:1px solid #eeeaf4;padding-top:8px}.views{display:flex;gap:4px;background:#ebe8f4;padding:3px;border-radius:9px}.views button{background:transparent;border-color:transparent;padding:7px 10px}.views button[aria-pressed=true]{background:white;color:#5036ac;box-shadow:0 1px 4px #211e3220}.registry{overflow:auto;background:#fff;border:1px solid #e4e0ee;border-radius:12px}.registry table{width:100%;border-collapse:collapse;text-align:left}.registry th,.registry td{padding:12px;border-bottom:1px solid #eeeaf4}.registry th{background:#f0edf7;font-size:13px;color:#514760}.registry tr:last-child td{border-bottom:0}.registry button{padding:0;border:0;color:#5036ac;text-align:left;background:transparent;font-weight:700}.registry td:nth-child(4),.registry td:nth-child(5){white-space:nowrap}
+.board{grid-template-columns:repeat(5,minmax(0,1fr))}.metrics{grid-template-columns:repeat(4,minmax(0,1fr))}
+@media(max-width:1150px){.board,.metrics{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:950px){.workspace{grid-template-columns:174px minmax(0,1fr)}.content{padding-inline:16px}}
+@media(max-width:680px){.board{grid-template-columns:1fr}.workspace{display:block}.sidebar{padding:8px 16px}.sidebar .brand{display:none}.sidebar nav{display:flex;flex-wrap:wrap;gap:4px}.metrics{grid-template-columns:1fr;gap:6px}.metric{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px 10px}.metric strong{margin:0}.registry table{min-width:660px}}
+.bank-table button.primary{background:#5942bd;color:white;padding:8px 10px;margin-top:8px}.bank-table button:disabled{opacity:.5}.bank-table select{max-width:100%}
+.registry td:last-child button+button{margin:6px 0 0 10px}
+@media(max-width:680px){
+  #registry,#queue .registry,#reconcile .registry{overflow:visible;background:transparent;border:0}
+  .registry .request-table{display:block;min-width:0}
+  .request-table thead{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
+  .request-table tbody{display:grid;gap:12px}
+  .request-table tr{display:grid;background:#fff;border:1px solid #e4e0ee;border-radius:12px;padding:12px 14px;min-width:0}
+  .request-table td{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:6px 0;border:0;white-space:normal!important;overflow-wrap:anywhere}
+  .request-table td::before{content:attr(data-label);color:#51617a;font-size:13px;flex-shrink:0}
+  .request-table td:nth-child(2){display:block;grid-row:1;font-size:17px}
+  .request-table td:nth-child(2)::before,.request-table td[data-label="Действие"]::before{content:none}
+  .request-table td[data-label="Действие"]{flex-wrap:wrap;gap:8px}
+  .request-table td[data-label="Действие"]:empty{display:none}
+  .registry .request-table td[data-label="Действие"] button{border:1px solid #ded6f0;border-radius:8px;padding:8px 10px;margin:0}
+}
+.nav-icon{display:inline-block;margin-right:8px}
+@media(max-width:680px){
+  .content{padding-bottom:calc(100px + env(safe-area-inset-bottom))}
+  .sidebar{position:fixed;z-index:5;inset:auto 0 0;background:#fff;color:#211e32;border-top:1px solid #e4e0ee;box-shadow:0 -4px 20px #211e3210;padding:5px max(8px,env(safe-area-inset-right)) calc(5px + env(safe-area-inset-bottom)) max(8px,env(safe-area-inset-left))}
+  .sidebar nav{display:flex;flex-wrap:nowrap;gap:4px}
+  .sidebar button{flex:1 1 0;min-width:0;min-height:60px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:4px 2px;color:#514760;text-align:center}
+  .sidebar button[aria-pressed=true]{background:#eee9fb;color:#5036ac}
+  .nav-icon{margin:0;font-size:22px;line-height:1}
+  .nav-label{font-size:11px;line-height:1.15;overflow-wrap:anywhere}
+  .views{display:none}
+}
+@media(max-width:680px){
+  .bank-table .request-table td:nth-child(2){grid-row:auto;font-size:inherit}
+  .bank-table .request-table td[data-label="Статус"]{display:grid;justify-content:stretch}
+  .bank-table label,.bank-table select{min-width:0;width:100%}
+  .bank-table button.primary{width:100%;min-height:44px;text-align:center}
+}
+.registry-filters{align-items:end}
+.registry-filters label{font-size:13px;color:#514760;min-width:0}
+.registry-filters input[type=number]{width:130px}
+@media(max-width:680px){.registry-filters{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}.registry-filters input,.registry-filters select{width:100%;min-width:0}.registry-filters button{grid-column:1/-1}}
+</style>
+</head>
+<body>
+<header><span class="logo" aria-hidden="true">₽</span><strong>Платежи</strong><span class="demo" id="identity">Демо</span><button id="logout" hidden>Выйти</button></header>
+<main id="signIn">
+<section class="login">
+<h1>Вход по телефону</h1>
+<p class="muted">Деморежим. Используйте тестовые номера. SMS-код появится на экране.</p>
+<label>Демо-пользователь<select id="demoAccount"></select></label>
+<form id="loginForm">
+<label>Телефон<input id="phone" type="tel" autocomplete="username" required></label>
+<label>Способ входа<select id="method"><option value="password">Пароль</option><option value="sms">SMS-код</option></select></label>
+<label id="passwordField">Пароль<input id="password" type="password" autocomplete="current-password" required></label>
+<div id="smsField" hidden>
+<button type="button" id="getCode">Получить демо-код</button>
+<label>SMS-код<input id="smsCode" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" maxlength="6"></label>
+</div>
+<button class="primary" type="submit">Войти</button>
+</form>
+<p class="muted">Пароль демо-пользователей: <code id="demoPasswordHint"></code></p>
+<p id="loginMessage" role="status"></p>
+<button id="exportLegacy" type="button" hidden>Сохранить прежние заявки для переноса</button>
+</section>
+</main>
+<div id="workspace" hidden class="workspace">
+<aside class="sidebar"><div class="brand"><span class="logo">₽</span><strong>Платёжный<br>контур</strong></div><nav aria-label="Просмотр заявок"><button type="button" data-view="board"><span class="nav-icon" aria-hidden="true">▦</span><span class="nav-label">Доска заявок</span></button><button type="button" data-view="registry"><span class="nav-icon" aria-hidden="true">☷</span><span class="nav-label">Реестр заявок</span></button><button type="button" data-view="queue" hidden><span class="nav-icon" aria-hidden="true">▤</span><span class="nav-label">Очередь на оплату</span></button><button type="button" data-view="reconcile" hidden><span class="nav-icon" aria-hidden="true">⇄</span><span class="nav-label">Банковская сверка</span></button></nav></aside>
+<main class="content">
+<section id="queue" hidden></section>
+<section id="reconcile" hidden></section>
+<div id="applications">
+<div class="pagehead">
+<div><div class="muted">Финансы / Заявки</div><h1>Согласование платежей</h1></div>
+<button class="primary" id="create">+ Новая заявка</button>
+</div>
+<div id="metrics" class="metrics" aria-label="Сводка по заявкам"></div>
+<div class="toolbar">
+<input id="search" type="search" placeholder="Поиск заявки" aria-label="Поиск заявки">
+<select id="companyFilter" aria-label="Фильтр по компании"><option value="">Все компании</option></select>
+ <div class="views" aria-label="Вид списка"><button type="button" data-view="board">Канбан</button><button type="button" data-view="registry">Реестр</button></div>
+</div>
+<div id="registryFilters" class="toolbar registry-filters" hidden>
+<label>Статус<select id="statusFilter"><option value="">Все статусы</option></select></label>
+<label>Подразделение<select id="departmentFilter"><option value="">Все подразделения</option></select></label>
+<label>Срок с<input id="dueFrom" type="date"></label>
+<label>Срок по<input id="dueTo" type="date"></label>
+<label>Сумма от, ₽<input id="amountFrom" type="number" min="0" step="0.01"></label>
+<label>Сумма до, ₽<input id="amountTo" type="number" min="0" step="0.01"></label>
+<button id="exportRegistry" type="button">Выгрузить в Excel</button>
+</div>
+<div id="registry" class="registry" hidden></div>
+<div class="board" id="board"></div>
+</div>
+<p id="message" role="status"></p>
+</main>
+</div>
+<dialog id="editor" aria-labelledby="editorTitle">
+<form id="requestForm">
+<h2 id="editorTitle">Новая заявка</h2>
+<label>Компания-плательщик<select name="company" required></select></label>
+<label>Подразделение<select name="department" required></select></label>
+<label>Получатель<input name="recipient" required maxlength="100"></label>
+<label>Сумма, ₽<input name="amount" type="number" min="0.01" max="999999999999" step="0.01" required></label>
+<label>Назначение<textarea name="purpose" required maxlength="500" rows="2"></textarea></label>
+<label>Срок оплаты<input name="due" type="date" required></label>
+<label>Ссылка на документ (необязательно)<input name="document" type="url" placeholder="https://"></label>
+<div class="actions"><button class="primary" type="submit">Отправить</button><button type="button" id="cancel">Отмена</button></div>
+</form>
+</dialog>
+<dialog id="deferDialog" aria-labelledby="deferTitle">
+<form id="deferForm">
+<h2 id="deferTitle">Перенос платежа</h2>
+<p id="deferSummary" class="muted"></p>
+<label>Новая дата оплаты<input id="deferDate" type="date" required></label>
+<label>Причина переноса<textarea id="deferReason" rows="3" maxlength="300" required></textarea></label>
+<div class="actions"><button class="primary" type="submit">Сохранить перенос</button><button type="button" id="cancelDefer">Отмена</button></div>
+</form>
+</dialog>
+<dialog id="detail" aria-labelledby="itemTitle"><div id="detailBody"></div></dialog>
+<script>
+'use strict';
+const $ = id => document.getElementById(id);
+const companies = ['ООО «Северный контур»', 'ООО «Практика Плюс»'];
+const articles = ['Аренда', 'Услуги', 'Материалы'];
+const stages = [
+  ['review', 'Новые', '#6278e3'],
+  ['approval', 'На согласовании', '#c47a25'],
+  ['approved', 'К оплате', '#5369c7'],
+  ['queued', 'В списке на оплату', '#8456bc'],
+  ['paid', 'Оплачено', '#25845d']
+];
+const departments = ['Администрация', 'Операции', 'ИТ'];
+const employeeId = 'demo-employee';
+const managerCompanies = [companies[0]];
+const approvers = ['Проверяющий', 'Офис-менеджер', 'Администратор офиса', 'Бухгалтер', 'Главный бухгалтер'];
+const legacyEmployeeIds = [1, 2, 5];
+function owner(request) {
+  return request.owner ?? (request.id > 5 || legacyEmployeeIds.includes(request.id) ? employeeId : 'other-employee');
+}
+let requests = [];
+let revision;
+let registryItems = [];
+let saving = false;
+const money = new Intl.NumberFormat('ru-RU',{style:'currency',currency:'RUB',maximumFractionDigits:2});
+const date = new Intl.DateTimeFormat('ru-RU',{day:'numeric',month:'short',year:'numeric',timeZone:'UTC'});
+function node(tag, content, className) {
+  const element = document.createElement(tag);
+  element.textContent = content;
+  if (className) element.className = className;
+  return element;
+}
+function route(request) {
+  const first = [
+    ['Офис-менеджер', 'Бухгалтер', 'Офис-менеджер'],
+    ['Администратор офиса', 'Главный бухгалтер', 'Бухгалтер']
+  ][companies.indexOf(request.company)][articles.indexOf(request.article)];
+  const limit = request.company === companies[0] ? 100000 : 75000;
+  return request.amount > limit ? [first, 'Руководитель'] : [first];
+}
+function assignee(request) {
+  if (request.stage === 'approval') return route(request)[request.step];
+  if (request.stage === 'review' && !request.returned) return 'Проверяющий';
+  return null;
+}
+function canView(request) {
+  if (!signedIn) return false;
+  switch (signedIn?.role) {
+    case 'employee': return owner(request) === employeeId;
+    case 'approver': return assignee(request) === signedIn?.name;
+    case 'owner':
+    case 'finance': return true;
+    case 'manager': return managerCompanies.includes(request.company);
+    default: return false;
+  }
+}
+function canAct(request) {
+  return (signedIn?.role === 'approver' && assignee(request) === signedIn?.name) ||
+    (signedIn?.role === 'manager' && assignee(request) === 'Руководитель' && canView(request));
+}
+let currentView = 'board';
+const openingBalance = 31800000;
+const cents = request => Math.round(request.amount * 100);
+const total = items => items.reduce((sum, request) => sum + cents(request), 0);
+const queueItems = () => requests.filter(request => request.stage === 'queued');
+const availableBalance = () => openingBalance -
+  total(requests.filter(request => request.stage === 'paid' && request.batch));
+const canOpenQueue = () => ['owner','finance'].includes(signedIn?.role);
+const canUseQueue = () => ['owner','manager','finance'].includes(signedIn?.role);
+
+const demoOperations = [
+  {id:'DEMO-01', date:'2026-11-20', company:companies[0], recipient:'ООО «Папирус»', amount:9450},
+  {id:'DEMO-02', date:'2026-11-24', company:companies[0], recipient:'ООО «Городские сети»', amount:18750},
+  {id:'DEMO-03', date:'2026-11-25', company:companies[1], recipient:'ООО «Линия офиса»', amount:36400},
+  {id:'DEMO-04', date:'2026-11-26', company:companies[0], recipient:'ООО «Деловой маршрут»', amount:7100}
+];
+function reconciliationCandidates(operation) {
+  const normalize = value => value.trim().replace(/\s+/g,' ').toLocaleLowerCase('ru');
+  return queueItems().filter(request => request.batch &&
+    request.company === operation.company &&
+    normalize(request.recipient) === normalize(operation.recipient) &&
+    cents(request) === cents(operation));
+}
+function confirmMatch(operation, request) {
+  if (signedIn?.role !== 'owner' ||
+      requests.some(item => item.bankOperation === operation.id) ||
+      !reconciliationCandidates(operation).includes(request)) return;
+  request.bankOperation = operation.id;
+  request.paidDate = operation.date;
+  request.stage = 'paid';
+  record(request,'Оплата подтверждена сверкой · ' + operation.id + ' · ' + date.format(new Date(operation.date)));
+  save('Совпадение подтверждено. Заявка №' + request.id + ' оплачена.');
+}
+function renderReconciliation() {
+  const panel = $('reconcile');
+  panel.replaceChildren(node('h1','Банковская сверка'),
+    node('p','Демонстрационные исходящие операции. Банк не подключён.','muted'),
+    node('p','Ожидают оплаты в утверждённом списке: ' + queueItems().filter(request => request.batch).length));
+  const table = node('table','');
+  const head = table.createTHead().insertRow();
+  table.className = 'request-table';
+  const titles = ['Операция','Плательщик и получатель','Сумма','Статус'];
+  for (const title of titles) {
+    const cell = node('th',title);
+    cell.scope = 'col';
+    head.append(cell);
+  }
+  const body = table.createTBody();
+  for (const operation of demoOperations) {
+    const row = body.insertRow();
+    row.insertCell().textContent = operation.id + ' · ' + date.format(new Date(operation.date));
+    row.insertCell().textContent = operation.company + ' → ' + operation.recipient;
+    row.insertCell().textContent = money.format(operation.amount);
+    const cell = row.insertCell();
+    for (const [index, title] of titles.entries()) row.cells[index].dataset.label = title;
+    const matched = requests.find(request => request.bankOperation === operation.id);
+    if (matched) {
+      cell.textContent = 'Оплачено · №' + matched.id;
+      continue;
+    }
+    const candidates = reconciliationCandidates(operation);
+    if (!candidates.length) {
+      cell.textContent = 'Нет совпадения в утверждённом списке';
+      continue;
+    }
+    const label = node('label','Заявка для сопоставления');
+    const select = node('select','');
+    select.append(new Option('Выберите заявку',''),...candidates.map(request =>
+      new Option('№' + request.id + ' · ' + request.purpose,String(request.id))));
+    if (candidates.length === 1) select.value = String(candidates[0].id);
+    const confirm = action('Подтвердить совпадение', () => {
+      const request = candidates.find(item => String(item.id) === select.value);
+      if (request) confirmMatch(operation, request);
+    },true);
+    confirm.disabled = !select.value;
+    select.onchange = () => { confirm.disabled = !select.value; };
+    label.append(select);
+    cell.append(node('p','Ожидает подтверждения','muted'),label,confirm);
+  }
+  const wrapper = node('div','','registry bank-table');
+  wrapper.append(table);
+  panel.append(wrapper);
+}
+
+function canDefer(request) {
+  return signedIn?.role === 'finance' && canView(request) && !request.batch &&
+    ['approved','queued'].includes(request.stage);
+}
+function deferPayment(request, due, reason) {
+  const explanation = reason.trim();
+  if (!canDefer(request) || !/^\d{4}-\d{2}-\d{2}$/.test(due) ||
+      due <= request.due || !explanation || explanation.length > 300) return false;
+  const previous = date.format(new Date(request.due));
+  request.due = due;
+  request.stage = 'approved';
+  record(request,'Перенос оплаты: ' + previous + ' → ' +
+    date.format(new Date(due)) + ' · Причина: ' + explanation);
+  return true;
+}
+let deferredRequest;
+function deferAction(request, close = () => {}) {
+  if (!canDefer(request)) return null;
+  return action('Перенести платёж', () => {
+    deferredRequest = request;
+    const form = $('deferForm');
+    form.reset();
+    $('deferDate').setCustomValidity('');
+    $('deferReason').setCustomValidity('');
+    $('deferSummary').textContent = 'Заявка №' + request.id + ' · ' + request.purpose +
+      ' · ' + money.format(request.amount) + ' · текущий срок ' + date.format(new Date(request.due));
+    close();
+    $('deferDialog').showModal();
+  });
+}
+$('cancelDefer').onclick = () => $('deferDialog').close();
+$('deferDate').oninput = () => $('deferDate').setCustomValidity('');
+$('deferReason').oninput = () => $('deferReason').setCustomValidity('');
+$('deferForm').onsubmit = event => {
+  event.preventDefault();
+  const due = $('deferDate');
+  const reason = $('deferReason');
+  if (!deferredRequest || !canDefer(deferredRequest)) return;
+  if (due.value <= deferredRequest.due) {
+    due.setCustomValidity('Выберите дату позже текущего срока оплаты.');
+    due.reportValidity();
+    return;
+  }
+  if (!reason.value.trim()) {
+    reason.setCustomValidity('Укажите причину переноса.');
+    reason.reportValidity();
+    return;
+  }
+  if (deferPayment(deferredRequest,due.value,reason.value)) {
+    $('deferDialog').close();
+    save('Срок оплаты изменён. Заявка оставлена на потом.');
+  }
+};
+function queueAction(request, close = () => {}) {
+  if (!canUseQueue() || !canView(request) ||
+      queueItems().some(item => item.batch) ||
+      !['approved','queued'].includes(request.stage)) return null;
+  const include = request.stage === 'approved';
+  return action(include ? 'Оплатить сейчас' : 'Оставить на потом', () => {
+    if (!canUseQueue() || !canView(request) || queueItems().some(item => item.batch) ||
+        request.stage !== (include ? 'approved' : 'queued')) return;
+    request.stage = include ? 'queued' : 'approved';
+    const message = include ? 'Заявка включена в список на оплату.' : 'Заявка оставлена на потом.';
+    record(request,message);
+    close();
+    save(message);
+  });
+}
+function renderQueue() {
+  const selected = queueItems();
+  const visible = requests.filter(request => canView(request) &&
+    ['approved','queued'].includes(request.stage));
+  const activeBatch = selected.some(request => request.batch);
+  const balance = availableBalance();
+  const listTotal = total(selected);
+  const panel = $('queue');
+  panel.replaceChildren(node('h1','Очередь на оплату'));
+  const metrics = node('div','','metrics');
+  for (const [label,amount] of [
+    ['Доступный остаток (демо)',balance],
+    ['Сумма списка',listTotal],
+    ['Остаток после оплаты',balance - listTotal]
+  ]) {
+    const metric = node('div','','metric');
+    metric.style.setProperty('--accent','#5942bd');
+    metric.append(node('span',label,'muted'),node('strong',money.format(amount / 100)));
+    metrics.append(metric);
+  }
+  panel.append(metrics);
+  const toolbar = node('div','','toolbar');
+  const status = activeBatch ? 'Список утверждён' :
+    listTotal > balance ? 'Сумма списка превышает доступный остаток' :
+    selected.length ? 'Список ждёт утверждения собственником' : 'Текущий список пуст';
+  toolbar.append(node('strong',status));
+  if (signedIn.role === 'owner') {
+    const approve = action('Утвердить весь список', () => {
+      const items = queueItems();
+      if (signedIn?.role !== 'owner' || !items.length ||
+          items.some(request => request.batch) || total(items) > availableBalance()) return;
+      const batch = new Date().toISOString();
+      for (const request of items) {
+        request.batch = batch;
+        record(request,'Список утверждён собственником');
+      }
+      save('Список утверждён. Заявок: ' + items.length + '.');
+    }, true);
+    approve.disabled = activeBatch || !selected.length || listTotal > balance;
+    toolbar.append(approve);
+  }
+  panel.append(toolbar);
+  renderRegistry(visible, panel);
+}
+function renderRegistry(items, target = $('registry')) {
+  const table = node('table','');
+  const head = table.createTHead().insertRow();
+  const inQueue = target === $('queue');
+  const titles = ['Номер','Заявка','Компания','Сумма','Срок','Статус'];
+  table.className = 'request-table';
+  if (inQueue) titles.push('Действие');
+  else titles.push('Подразделение');
+  for (const title of titles) {
+    const cell = node('th',title);
+    cell.scope = 'col';
+    head.append(cell);
+  }
+  const body = table.createTBody();
+  for (const request of [...items].sort((a,b) => b.id - a.id)) {
+    const row = body.insertRow();
+    row.insertCell().textContent = '№ ' + request.id;
+    row.insertCell().append(action(request.purpose, () => show(request)));
+    row.insertCell().textContent = request.company;
+    row.insertCell().textContent = money.format(request.amount);
+    row.insertCell().textContent = date.format(new Date(request.due));
+    row.insertCell().textContent = request.stage === 'queued' && request.batch ? 'Список утверждён' : request.returned ? 'На исправлении' :
+      stages.find(([stage]) => stage === request.stage)[1];
+    if (inQueue) {
+      const cell = row.insertCell();
+      const selection = queueAction(request);
+      if (selection) cell.append(selection);
+      const defer = deferAction(request);
+      if (defer) cell.append(defer);
+    }
+    if (!inQueue) row.insertCell().textContent = request.department;
+    for (const [index, title] of titles.entries()) row.cells[index].dataset.label = title;
+  }
+  const result = items.length ? table : node('p','Нет заявок по выбранным условиям','empty');
+  if (inQueue) {
+    const wrapper = node('div','','registry');
+    wrapper.append(result);
+    target.append(wrapper);
+  } else {
+    target.replaceChildren(result);
+  }
+}
+for (const button of document.querySelectorAll('[data-view]')) {
+  button.onclick = () => {
+    currentView = button.dataset.view;
+    render();
+  };
+}
+function render() {
+  $('create').hidden = signedIn?.role !== 'employee';
+
+  const query = $('search').value.trim().toLocaleLowerCase('ru');
+  const company = $('companyFilter').value;
+  const visible = requests.filter(r => canView(r) && (!company || r.company === company) &&
+    [r.id,r.recipient,r.company,r.purpose].join(' ').toLocaleLowerCase('ru').includes(query));
+  const queueView = currentView === 'queue' && canOpenQueue();
+  const reconcileView = currentView === 'reconcile' && signedIn?.role === 'owner';
+  $('applications').hidden = queueView || reconcileView;
+  $('reconcile').hidden = !reconcileView;
+  document.querySelector('[data-view=reconcile]').hidden = signedIn?.role !== 'owner';
+  $('queue').hidden = !queueView;
+  document.querySelector('[data-view=queue]').hidden = !canOpenQueue();
+  const boardView = currentView === 'board';
+  $('board').hidden = !boardView;
+  $('registry').hidden = boardView;
+  $('registryFilters').hidden = currentView !== 'registry';
+  for (const button of document.querySelectorAll('[data-view]')) {
+    button.setAttribute('aria-pressed', String(button.dataset.view === currentView));
+  }
+  if (reconcileView) {
+    renderReconciliation();
+    return;
+  }
+  if (queueView) {
+    renderQueue();
+    return;
+  }
+  $('metrics').replaceChildren(...stages.slice(1).map(([stage,title,color]) => {
+    const items = visible.filter(request => request.stage === stage);
+    const metric = node('div','','metric');
+    metric.style.setProperty('--accent',color);
+    metric.append(node('span',title,'muted'),
+      node('strong',money.format(items.reduce((sum,request) => sum + request.amount,0))),
+      node('span','Заявок: ' + items.length,'muted'));
+    return metric;
+  }));
+  if (!boardView) {
+    const status = $('statusFilter').value;
+    const department = $('departmentFilter').value;
+    const from = $('dueFrom').value;
+    const to = $('dueTo').value;
+    const min = $('amountFrom').value;
+    const max = $('amountTo').value;
+    registryItems = visible.filter(r =>
+      (!status || (r.returned ? 'returned' : r.stage) === status) &&
+      (!department || r.department === department) &&
+      (!from || r.due >= from) && (!to || r.due <= to) &&
+      (!min || cents(r) >= Math.round(Number(min) * 100)) &&
+      (!max || cents(r) <= Math.round(Number(max) * 100)));
+    renderRegistry(registryItems);
+    return;
+  }
+  $('board').replaceChildren(...stages.map(([stage,title,color]) => {
+    const lane = node('section','','lane');
+    lane.style.setProperty('--accent',color);
+    const items = visible.filter(r => r.stage === stage);
+    const heading = node('header','');
+    heading.append(node('h2',title),node('div',items.length + ' · ' + money.format(items.reduce((sum,r) => sum + r.amount,0)),'summary'));
+    lane.append(heading);
+    if (!items.length) lane.append(node('div','Нет заявок','empty'));
+    for (const r of items) {
+      const card = node('button','','card');
+      card.append(node('span','#' + r.id + ' · ' + r.company,'muted'),node('strong',r.purpose),
+        node('span',money.format(r.amount),'amount'),node('span',r.recipient,'muted'),
+        node('span','До ' + date.format(new Date(r.due)),'muted due'));
+      if (r.returned) card.append(node('span','На исправлении','muted'));
+      if (stage === 'approval') card.append(node('span','Согласует: ' + route(r)[r.step],'muted'));
+      card.onclick = () => show(r);
+      lane.append(card);
+    }
+    return lane;
+  }));
+}
+function applySnapshot(snapshot) {
+  requests = snapshot.requests;
+  revision = snapshot.revision;
+}
+async function loadRequests() {
+  const response = await fetch('/api/requests', {cache:'no-store'});
+  if (!response.ok) throw new Error('Ошибка загрузки');
+  applySnapshot(await response.json());
+}
+async function save(message) {
+  if (saving) return;
+  saving = true;
+  $('workspace').inert = true;
+  $('logout').disabled = true;
+  try {
+    const response = await fetch('/api/requests', {
+      method:'PUT', headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({revision,requests})
+    });
+    if (!response.ok) throw new Error(response.status === 409 ?
+      'Данные изменились. Повторите действие после обновления.' : 'Изменение отклонено сервером.');
+    applySnapshot(await response.json());
+  } catch (error) {
+    message = 'Сохранение не подтверждено. ' + error.message;
+    try { await loadRequests(); }
+    catch { revision = undefined; message += ' Обновите страницу после восстановления связи.'; }
+  } finally {
+    saving = false;
+    $('workspace').inert = revision === undefined;
+    $('logout').disabled = false;
+    render();
+    $('message').textContent = message;
+  }
+}
+async function exportRegistry() {
+  try {
+    const response = await fetch('/api/registry.xlsx', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({revision,ids:registryItems.map(request => request.id)})
+    });
+    if (!response.ok) throw new Error('Не удалось выгрузить реестр. Обновите страницу.');
+    const url = URL.createObjectURL(await response.blob());
+    const link = node('a','');
+    link.href = url;
+    link.download = 'payment-registry.xlsx';
+    link.click();
+    setTimeout(() => URL.revokeObjectURL(url),1000);
+  } catch (error) {
+    $('message').textContent = error.message;
+  }
+}
+$('statusFilter').append(...stages.map(([value,title]) => new Option(title,value)),
+  new Option('На исправлении','returned'));
+$('departmentFilter').append(...departments.map(name => new Option(name)));
+$('requestForm').elements.namedItem('department').append(...departments.map(name => new Option(name)));
+$('registryFilters').oninput = render;
+$('exportRegistry').onclick = exportRegistry;
+function action(title, run, primary = false) {
+  const btn = node('button',title,primary ? 'primary' : '');
+  btn.type = 'button';
+  btn.onclick = run;
+  return btn;
+}
+function record(request, text) { (request.history ??= []).push(text); }
+function show(r) {
+  if (!canView(r)) return;
+  const detail = $('detailBody');
+  detail.replaceChildren(node('h2','Заявка №' + r.id,'details'));
+  detail.firstChild.id = 'itemTitle';
+  detail.append(node('p',r.company + '\n' + r.recipient + '\n' + money.format(r.amount) +
+    '\n' + r.purpose + '\nОплатить до ' + date.format(new Date(r.due)),'details'));
+  if (r.document && /^https?:\/\//i.test(r.document)) {
+    const link = node('a','Документ'); link.href = r.document;
+    link.target = '_blank'; link.rel = 'noopener noreferrer'; detail.append(link);
+  }
+  if (r.article) detail.append(node('p','Статья: ' + r.article,'muted'));
+  if (r.history?.length) detail.append(node('p',r.history.join('\n'),'details muted'));
+  const actions = node('div','','actions');
+  function done(message) { $('detail').close(); save(message); }
+  if (r.stage === 'review' && r.returned && signedIn?.role === 'employee') {
+    actions.append(action('Исправить заявку',() => { $('detail').close(); edit(r); },true));
+  } else if (r.stage === 'review' && canAct(r)) {
+    const label = node('label','Статья расходов');
+    const select = node('select','');
+    select.append(new Option('Выберите статью',''),...articles.map(a => new Option(a)));
+    label.append(select);
+    detail.append(label,node('p','Статью выбирает проверяющий.','muted'));
+    const send = action('Передать на согласование',() => {
+      r.article = select.value;
+      r.step = 0;
+      r.stage = 'approval';
+      record(r,'Передано на согласование');
+      done('Заявка передана на согласование.');
+    },true);
+    send.disabled = true;
+    select.onchange = () => { send.disabled = !select.value; };
+    actions.append(send);
+  } else if (r.stage === 'approval') {
+    const approvers = route(r);
+    detail.append(node('p','Маршрут: ' + approvers.join(' → ') + '\nСейчас согласует: ' + approvers[r.step],'note details'));
+    if (canAct(r)) actions.append(action('Согласовать',() => {
+      record(r,'Согласовано: ' + approvers[r.step]);
+      r.step += 1;
+      if (r.step === approvers.length) r.stage = 'approved';
+      done(r.stage === 'approved' ? 'Заявка согласована.' : 'Заявка передана следующему согласующему.');
+    },true));
+  }
+  const selection = queueAction(r, () => $('detail').close());
+  if (selection) actions.append(selection);
+  const defer = deferAction(r, () => $('detail').close());
+  if (defer) actions.append(defer);
+  if (canAct(r)) {
+    const label = node('label','Комментарий для возврата');
+    const comment = node('textarea','');
+    comment.rows = 2;
+    comment.maxLength = 300;
+    label.append(comment);
+    detail.append(label);
+    const back = action('Вернуть',() => {
+      r.stage = 'review';
+      r.returned = true;
+      record(r,'Возврат: ' + comment.value.trim());
+      done('Заявка возвращена на исправление.');
+    });
+    back.disabled = true;
+    comment.oninput = () => { back.disabled = !comment.value.trim(); };
+    actions.append(back);
+  }
+  actions.append(action('Закрыть',() => $('detail').close()));
+  detail.append(actions);
+  $('detail').showModal();
+}
+const form = $('requestForm');
+let edited;
+function edit(request) {
+  if (!signedIn) return;
+  if (signedIn?.role !== 'employee' || (request && !canView(request))) return;
+  edited = request;
+  form.reset();
+  $('editorTitle').textContent = request ? 'Исправление заявки' : 'Новая заявка';
+  if (request) {
+    for (const field of ['company','department','recipient','amount','purpose','due','document']) {
+      form.elements.namedItem(field).value = request[field] ?? '';
+    }
+  }
+  $('editor').showModal();
+}
+form.elements.namedItem('company').append(...companies.map(company => new Option(company)));
+function refreshCompanyFilter() {
+  const available = signedIn?.role === 'manager' ? managerCompanies : companies;
+  $('companyFilter').replaceChildren(new Option('Все доступные компании', ''),
+    ...available.map(company => new Option(company)));
+}
+$('create').onclick = () => edit();
+$('cancel').onclick = () => $('editor').close();
+$('search').oninput = render;
+$('companyFilter').onchange = render;
+form.onsubmit = event => {
+  if (!signedIn) { event.preventDefault(); return; }
+  event.preventDefault();
+  const fields = Object.fromEntries(new FormData(form));
+  fields.recipient = fields.recipient.trim();
+  fields.purpose = fields.purpose.trim();
+  if (!fields.recipient || !fields.purpose) {
+    const input = form.elements.namedItem(fields.recipient ? 'purpose' : 'recipient');
+    input.value = '';
+    input.reportValidity();
+    return;
+  }
+  if (fields.document && !/^https?:\/\//i.test(fields.document)) {
+    const input = form.elements.namedItem('document');
+    input.setCustomValidity('Укажите ссылку с http:// или https://.');
+    input.reportValidity();
+    input.oninput = () => input.setCustomValidity('');
+    return;
+  }
+  fields.amount = Number(fields.amount);
+  const request = edited ?? {id:Math.max(0,...requests.map(r => r.id)) + 1,stage:'review',owner:employeeId};
+  Object.assign(request,fields,{returned:false,article:null,step:0});
+  record(request,edited ? 'Исправлено и отправлено на проверку' : 'Отправлено на проверку');
+  if (!edited) requests.unshift(request);
+  $('editor').close();
+  $('search').value = '';
+  $('companyFilter').value = '';
+  save('Заявка отправлена на проверку.');
+};
+const demoPassword = Array.from(crypto.getRandomValues(new Uint8Array(8)),
+  byte => byte.toString(16).padStart(2,'0')).join('');
+$('demoPasswordHint').textContent = demoPassword;
+const accounts = [
+  {role:'employee', name:'Сотрудник'},
+  ...approvers.map(name => ({role:'approver', name})),
+  {role:'manager', name:'Руководитель'},
+  {role:'owner', name:'Собственник'},
+  {role:'finance', name:'Финансист'}
+].map((account,index) => ({...account,phone:'+7000000000' + (index + 1)}));
+let signedIn = null;
+let challenge = null;
+const loginForm = $('loginForm');
+const phoneInput = $('phone');
+const method = $('method');
+const smsCode = $('smsCode');
+const password = $('password');
+function phoneNumber(value) {
+  if (!/^[+0-9 ()-]+$/.test(value)) return '';
+  let digits = value.replace(/\D/g,'');
+  if (digits.length === 10) digits = '7' + digits;
+  if (digits.length === 11 && digits.startsWith('8')) digits = '7' + digits.slice(1);
+  return digits.length === 11 && digits.startsWith('7') ? '+' + digits : '';
+}
+function clearChallenge() {
+  challenge = null;
+  smsCode.value = '';
+  $('loginMessage').textContent = '';
+}
+function showLoginMethod() {
+  const sms = method.value === 'sms';
+  $('passwordField').hidden = sms;
+  password.required = !sms;
+  $('smsField').hidden = !sms;
+  smsCode.required = sms;
+  password.value = '';
+  clearChallenge();
+}
+function showSession(account) {
+  signedIn = account;
+  currentView = 'board';
+  $('signIn').hidden = Boolean(account);
+  $('workspace').hidden = !account;
+  $('logout').hidden = !account;
+  $('identity').textContent = account ? account.name : 'Демо';
+  if (!account) {
+    $('board').replaceChildren();
+    $('message').textContent = '';
+    return;
+  }
+  $('search').value = '';
+  refreshCompanyFilter();
+  render();
+}
+$('demoAccount').append(new Option('Выбрать тестовый номер',''),
+  ...accounts.map(account => new Option(account.name + ' · ' + account.phone,account.phone)));
+$('demoAccount').onchange = () => {
+  phoneInput.value = $('demoAccount').value;
+  clearChallenge();
+};
+phoneInput.oninput = clearChallenge;
+method.onchange = showLoginMethod;
+$('getCode').onclick = () => {
+  clearChallenge();
+  const phone = phoneNumber(phoneInput.value);
+  if (!accounts.some(account => account.phone === phone)) {
+    $('loginMessage').textContent = 'Выберите тестовый номер из списка.';
+    return;
+  }
+  const code = String(100000 + crypto.getRandomValues(new Uint32Array(1))[0] % 900000);
+  challenge = {phone,code,expires:Date.now() + 120000};
+  $('loginMessage').textContent = 'Демо-код: ' + code + '. Действует 2 минуты.';
+  smsCode.focus();
+};
+loginForm.onsubmit = event => {
+  event.preventDefault();
+  if (revision === undefined) return;
+  const phone = phoneNumber(phoneInput.value);
+  const account = accounts.find(item => item.phone === phone);
+  const sms = method.value === 'sms';
+  const valid = sms
+    ? challenge?.phone === phone && challenge.expires > Date.now() && smsCode.value === challenge.code
+    : password.value === demoPassword;
+  if (!account || !valid) {
+    $('loginMessage').textContent = sms ? 'Код неверный или истёк. Можно получить новый код.' : 'Неверный телефон или пароль.';
+    return;
+  }
+  loginForm.reset();
+  $('demoAccount').value = '';
+  showLoginMethod();
+  showSession(account);
+};
+$('logout').onclick = () => showSession(null);
+showLoginMethod();
+showSession(null);
+const submitLogin = loginForm.querySelector('button[type=submit]');
+submitLogin.disabled = true;
+if (location.protocol === 'file:') {
+  $('loginMessage').textContent = 'Для работы откройте адрес FastAPI из README.md.';
+  try {
+    const legacy = localStorage.getItem('payment-approval-demo-v1');
+    if (legacy && JSON.parse(legacy).length) {
+      const button = $('exportLegacy');
+      button.hidden = false;
+      button.onclick = () => {
+        const url = URL.createObjectURL(new Blob([legacy],{type:'application/json'}));
+        const link = node('a','');
+        link.href = url;
+        link.download = 'legacy-payments.json';
+        link.click();
+        setTimeout(() => URL.revokeObjectURL(url),1000);
+      };
+    }
+  } catch {
+    $('loginMessage').textContent += ' Браузер не предоставил доступ к прежним данным.';
+  }
+} else loadRequests().then(() => { submitLogin.disabled = false; }).catch(() => {
+  $('loginMessage').textContent = 'Откройте сервис через адрес FastAPI. Инструкция в README.md.';
+});
+</script>
+</body>
+</html>
