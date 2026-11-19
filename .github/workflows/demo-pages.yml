@@ -38,3 +38,27 @@ jobs:
           path: public-demo
       - uses: actions/deploy-pages@v4
         id: deployment
+      - name: Проверить опубликованный адрес
+        env:
+          PUBLIC_URL: ${{ steps.deployment.outputs.page_url }}
+        run: |
+          python - <<'PY'
+          import os
+          import time
+          from urllib.request import urlopen
+          from urllib.error import URLError
+
+          url = os.environ['PUBLIC_URL']
+          for attempt in range(12):
+              try:
+                  with urlopen(url, timeout=10) as response:
+                      page = response.read().decode('utf-8')
+                  if '<script src="demo.js"></script>' in page:
+                      print(f'Публичная страница доступна: {url}')
+                      break
+              except URLError:
+                  pass
+              time.sleep(5)
+          else:
+              raise SystemExit('Публичная страница недоступна')
+          PY
